@@ -1,9 +1,5 @@
+const config = require("./config.js");
 const { Client } = require("pg");
-const CLIENT_CREDENTIALS = {
-  database: "todo-lists",
-  user: "postgres",
-  password: "",
-};
 
 const logQuery = (statement, parameters) => {
   let timestamp = new Date();
@@ -11,9 +7,15 @@ const logQuery = (statement, parameters) => {
   console.log(formattedTimestamp, statement, parameters);
 };
 
+const isProduction = (config.NODE_ENV === "production");
+const CONNECTION = {
+  connectionString: config.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+};
+
 module.exports = {
   async dbQuery(statement, ...parameters) {
-    let client = new Client(CLIENT_CREDENTIALS);
+    let client = new Client(CONNECTION);
 
     await client.connect();
     logQuery(statement, parameters);
